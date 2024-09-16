@@ -1,0 +1,92 @@
+[gd_scene load_steps=9 format=3 uid="uid://c426tfqdauj0b"]
+
+[ext_resource type="Texture2D" uid="uid://b0ydo8yoi14ri" path="res://assets/images/Lock_icon.png" id="2_g3slf"]
+[ext_resource type="Texture2D" uid="uid://yy66ruful77" path="res://assets/images/dice/d6.png" id="2_rfmjj"]
+[ext_resource type="Script" path="res://die.gd" id="2_u0uem"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_if4tb"]
+size = Vector2(51, 52)
+
+[sub_resource type="Animation" id="Animation_a35re"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Die:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_bm4ge"]
+resource_name = "roll"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Die:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1, 0.15),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_jd8cp"]
+_data = {
+"RESET": SubResource("Animation_a35re"),
+"roll": SubResource("Animation_bm4ge")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hell3"]
+size = Vector2(51, 52)
+
+[node name="DieBody" type="StaticBody2D" groups=["droppable"]]
+position = Vector2(24, 24)
+scale = Vector2(0.941176, 0.923077)
+script = ExtResource("2_u0uem")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("RectangleShape2D_if4tb")
+
+[node name="Die" type="Sprite2D" parent="."]
+z_as_relative = false
+texture = ExtResource("2_rfmjj")
+hframes = 6
+
+[node name="Lock" type="Sprite2D" parent="Die"]
+visible = false
+z_index = 1
+position = Vector2(17, -16.75)
+scale = Vector2(0.0341795, 0.0361328)
+texture = ExtResource("2_g3slf")
+
+[node name="RollAnimation" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_jd8cp")
+}
+
+[node name="ClickTimer" type="Timer" parent="."]
+wait_time = 0.091
+one_shot = true
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+visible = false
+position = Vector2(3.8147e-06, 0)
+shape = SubResource("RectangleShape2D_hell3")
+
+[connection signal="animation_finished" from="RollAnimation" to="." method="_animation_finished"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+[connection signal="input_event" from="Area2D" to="." method="_on_click"]
+[connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
